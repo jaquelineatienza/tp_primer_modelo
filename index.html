@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.0.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/toxicity@1.2.2"></script>
+  </head>
+  <body>
+    <h1>Toxicity Detection</h1>
+    <label for="text">ingrese el texto ah analizar</label>
+    <input type="text" name="" id="text" />
+    <button id="btn">analizar</button>
+    <p id="parrafo"></p>
+    <script>
+      const threshold = 0.5;
+      let sentences = [
+        "You are a poopy head!",
+        "I like turtles",
+        "Shut up!",
+        "are stupid",
+        "This is a test sentence.",
+      ];
+      const btn = document.getElementById("btn");
+      const parrafo = document.getElementById("parrafo");
+      let json;
+      btn.addEventListener("click", () => {
+        const text = document.getElementById("text").value;
+        text.value = "";
+        console.log(text);
+        sentences.push(text);
+        toxicity.load(threshold).then((model) => {
+          const ultimoElemento = sentences[sentences.length - 1];
+          console.log(ultimoElemento);
+          model.classify(ultimoElemento).then((predictions) => {
+            json = JSON.stringify(predictions, null, 2);
+            console.log(json);
+            istToxic(JSON.parse(json), ultimoElemento);
+          });
+        });
+      });
+      const istToxic = (json, text) => {
+        const toxic = json.filter((item) => item.results[0].match === true);
+        if (toxic.length > 0) {
+          console.log(text);
+          console.log("toxic");
+          parrafo.innerHTML += `<span style="color: red;">El texto "${text}" es tóxico.</span>`;
+        } else {
+          parrafo.innerHTML += `<span style="color:green ;">El texto "${text}" no es tóxico.</span>`;
+        }
+      };
+    </script>
+  </body>
+</html>
